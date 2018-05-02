@@ -1,0 +1,3 @@
+---- CalculationCurBattCapacity Matches (2 in 1 files) ----
+Tp5602.c (src):static void CalculationCurBattCapacity(void)
+Tp5602.c (src):		CalculationCurBattCapacity();
