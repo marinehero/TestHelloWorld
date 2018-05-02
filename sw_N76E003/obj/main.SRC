@@ -292,6 +292,15 @@ SADEN_1	DATA	0BAH
 ;  系统10ms唤醒一次,所有的计时都在主程序中进行
 ;  10ms中断只做定时唤醒
 ;  */
+;  
+;  /*
+;            b7        b6        b5        b4        b3        b2         b1         b0
+;  config0   CBS       Reserved  OCDPWM    OCDEN     Reserved  RPD        LOCK       Reserved     0xf9   RST_PIN->P2.0  LOCK_EN
+;  config1   Reserved  Reserved  Reserved  Reserved  Reserved  LDSIZE[2]  LDSIZE[1]  LDSIZE[0]    0xff
+;  config2   CBODEN    Reserved  CBOV[1]   CBOV[0]   BOIAP     CBORST     Reserved   Reserved     0xef   2.7V
+;  config3   Reserved  Reserved  Reserved  Reserved  Reserved  Reserved   Reserved   Reserved     0xff
+;  config4   WDTEN[3]  WDTEN[2]  WDTEN[1]  WDTEN[0]  Reserved  Reserved   Reserved   Reserved     0xff
+;  */
 ; #include "../inc/main.h"
 ; #include "../inc/key.h"
 ; #include "../inc/adc.h"
@@ -309,24 +318,24 @@ SADEN_1	DATA	0BAH
 
 	RSEG  ?PR?SystemInit?MAIN
 SystemInit:
-			; SOURCE LINE # 20
+			; SOURCE LINE # 29
 ; {
-			; SOURCE LINE # 21
+			; SOURCE LINE # 30
 ; 	CKDIV = 1;  //fosc = 16M  fCPU = 8M
-			; SOURCE LINE # 22
+			; SOURCE LINE # 31
 	MOV  	CKDIV,#01H
 ; 	set_CLOEN;
-			; SOURCE LINE # 23
+			; SOURCE LINE # 32
 	ORL  	CKCON,#02H
 ; 																// when P3.0 keep high, clock out HIRC
 ; 	tick_flag = true;
-			; SOURCE LINE # 25
+			; SOURCE LINE # 34
 	MOV  	tick_flag,#01H
 ; 	sleep_flag = false;
-			; SOURCE LINE # 26
+			; SOURCE LINE # 35
 	MOV  	sleep_flag,#00H
 ; }
-			; SOURCE LINE # 27
+			; SOURCE LINE # 36
 ?C0001:
 	RET  	
 ; END OF SystemInit
@@ -337,9 +346,9 @@ SystemInit:
 	RSEG  ?PR?BOD_Init?MAIN
 BOD_Init:
 	USING	0
-			; SOURCE LINE # 29
+			; SOURCE LINE # 38
 ; {
-			; SOURCE LINE # 30
+			; SOURCE LINE # 39
 ; #pragma asm
 ;   MOV TA, #0AAH
 	  MOV TA, #0AAH
@@ -357,7 +366,7 @@ BOD_Init:
 	  MOV BODCON1, #07H     
 ; #pragma endasm
 ; }
-			; SOURCE LINE # 40
+			; SOURCE LINE # 49
 ?C0002:
 	RET  	
 ; END OF BOD_Init
@@ -374,16 +383,16 @@ CSEG	AT	0008BH
 	RSEG  ?PR?Wkt_ISR?MAIN
 	USING	0
 Wkt_ISR:
-			; SOURCE LINE # 45
+			; SOURCE LINE # 54
 ; {  
 ; 	clr_WKTF;
-			; SOURCE LINE # 47
+			; SOURCE LINE # 56
 	ANL  	WKCON,#0EFH
 ;   tick_flag=true;
-			; SOURCE LINE # 48
+			; SOURCE LINE # 57
 	MOV  	tick_flag,#01H
 ; }
-			; SOURCE LINE # 49
+			; SOURCE LINE # 58
 ?C0003:
 	RETI 	
 ; END OF Wkt_ISR
@@ -393,20 +402,20 @@ Wkt_ISR:
 
 	RSEG  ?PR?WKT_Init?MAIN
 WKT_Init:
-			; SOURCE LINE # 51
+			; SOURCE LINE # 60
 ; {
-			; SOURCE LINE # 52
+			; SOURCE LINE # 61
 ; 	RWK=156;        //10MS
-			; SOURCE LINE # 53
+			; SOURCE LINE # 62
 	MOV  	RWK,#09CH
 ;   WKCON = 0x08;   //1分频  
-			; SOURCE LINE # 54
+			; SOURCE LINE # 63
 	MOV  	WKCON,#08H
 ; 	set_EWKT;//使能wkt中断
-			; SOURCE LINE # 55
+			; SOURCE LINE # 64
 	ORL  	EIE1,#04H
 ; }
-			; SOURCE LINE # 56
+			; SOURCE LINE # 65
 ?C0004:
 	RET  	
 ; END OF WKT_Init
@@ -451,12 +460,12 @@ WKT_Init:
 
 	RSEG  ?PR?Iwdg_Init?MAIN
 Iwdg_Init:
-			; SOURCE LINE # 93
+			; SOURCE LINE # 102
 ; 	{
-			; SOURCE LINE # 94
+			; SOURCE LINE # 103
 ; 		
 ; 	}
-			; SOURCE LINE # 96
+			; SOURCE LINE # 105
 ?C0005:
 	RET  	
 ; END OF Iwdg_Init
@@ -470,17 +479,17 @@ Iwdg_Init:
 	RSEG  ?PR?EnterSleep?MAIN
 EnterSleep:
 	USING	0
-			; SOURCE LINE # 101
+			; SOURCE LINE # 110
 ; {
-			; SOURCE LINE # 102
+			; SOURCE LINE # 111
 ; 	DisplayEnterSleep();
-			; SOURCE LINE # 103
+			; SOURCE LINE # 112
 	LCALL	DisplayEnterSleep
 ; 	EnterStandby();
-			; SOURCE LINE # 104
+			; SOURCE LINE # 113
 	LCALL	EnterStandby
 ; }
-			; SOURCE LINE # 105
+			; SOURCE LINE # 114
 ?C0006:
 	RET  	
 ; END OF EnterSleep
@@ -491,17 +500,17 @@ EnterSleep:
 	RSEG  ?PR?ExitSleep?MAIN
 ExitSleep:
 	USING	0
-			; SOURCE LINE # 107
+			; SOURCE LINE # 116
 ; {  
-			; SOURCE LINE # 108
+			; SOURCE LINE # 117
 ; 	DisplayExitSleep();
-			; SOURCE LINE # 109
+			; SOURCE LINE # 118
 	LCALL	DisplayExitSleep
 ; 	EnterNormal();
-			; SOURCE LINE # 110
+			; SOURCE LINE # 119
 	LCALL	EnterNormal
 ; }
-			; SOURCE LINE # 111
+			; SOURCE LINE # 120
 ?C0007:
 	RET  	
 ; END OF ExitSleep
@@ -514,39 +523,39 @@ ExitSleep:
 	RSEG  ?PR?main?MAIN
 main:
 	USING	0
-			; SOURCE LINE # 115
+			; SOURCE LINE # 124
 ; {
-			; SOURCE LINE # 116
+			; SOURCE LINE # 125
 ; 	Delayms(100);
-			; SOURCE LINE # 117
+			; SOURCE LINE # 126
 	MOV  	R7,#064H
 	MOV  	R6,#00H
 	LCALL	_Delayms
 ; 	
 ; 	Iwdg_Init();
-			; SOURCE LINE # 119
+			; SOURCE LINE # 128
 	LCALL	Iwdg_Init
 ; 	SystemInit();
-			; SOURCE LINE # 120
+			; SOURCE LINE # 129
 	LCALL	SystemInit
 ; 	BOD_Init();
-			; SOURCE LINE # 121
+			; SOURCE LINE # 130
 	LCALL	BOD_Init
 ;   
 ; 	InitAdc();
-			; SOURCE LINE # 123
+			; SOURCE LINE # 132
 	LCALL	InitAdc
 ; 	KeyInit();
-			; SOURCE LINE # 124
+			; SOURCE LINE # 133
 	LCALL	KeyInit
 ; 	WKT_Init();
-			; SOURCE LINE # 125
+			; SOURCE LINE # 134
 	LCALL	WKT_Init
 ; 	DisplayInitPoweron();
-			; SOURCE LINE # 126
+			; SOURCE LINE # 135
 	LCALL	DisplayInitPoweron
 ; 	TP5602InitPoweron();
-			; SOURCE LINE # 127
+			; SOURCE LINE # 136
 	LCALL	TP5602InitPoweron
 ; 
 ; 	/*
@@ -560,70 +569,70 @@ main:
 ; 	clr_P07;
 ; 	*/
 ; 	EnterNormal();
-			; SOURCE LINE # 139
+			; SOURCE LINE # 148
 	LCALL	EnterNormal
 ?C0008:
 ; 	
 ; 	IWDG_Feed();
 ; 	while (1)
-			; SOURCE LINE # 142
+			; SOURCE LINE # 151
 ; 	{
-			; SOURCE LINE # 143
+			; SOURCE LINE # 152
 ; 		if(tick_flag)
-			; SOURCE LINE # 144
+			; SOURCE LINE # 153
 	MOV  	A,tick_flag
 	JZ   	?C0010
 ; 		{
-			; SOURCE LINE # 145
+			; SOURCE LINE # 154
 ; 			tick_flag = false;
-			; SOURCE LINE # 146
+			; SOURCE LINE # 155
 	MOV  	tick_flag,#00H
 ; 			IWDG_Feed();
 ; 			AdcTimeHook();
-			; SOURCE LINE # 148
+			; SOURCE LINE # 157
 	LCALL	AdcTimeHook
 ; 			Tp5602Funtion();
-			; SOURCE LINE # 149
+			; SOURCE LINE # 158
 	LCALL	Tp5602Funtion
 ; 			KeyFuntion();
-			; SOURCE LINE # 150
+			; SOURCE LINE # 159
 	LCALL	KeyFuntion
 ; 			RefreshDisplay();
-			; SOURCE LINE # 151
+			; SOURCE LINE # 160
 	LCALL	RefreshDisplay
 ; 		}
-			; SOURCE LINE # 152
+			; SOURCE LINE # 161
 ?C0010:
 ; 	#ifndef DEBUG
 ; 	if(IsDispStandby())
-			; SOURCE LINE # 154
+			; SOURCE LINE # 163
 	LCALL	IsDispStandby
 	MOV  	A,R7
 	JZ   	?C0011
 ; 	{
-			; SOURCE LINE # 155
+			; SOURCE LINE # 164
 ; 		set_PD;
-			; SOURCE LINE # 156
+			; SOURCE LINE # 165
 	ORL  	PCON,#02H
 ; 	}else
-			; SOURCE LINE # 157
+			; SOURCE LINE # 166
 	SJMP 	?C0008
 ?C0011:
 ; 		{
-			; SOURCE LINE # 158
+			; SOURCE LINE # 167
 ; 			set_IDL;
-			; SOURCE LINE # 159
+			; SOURCE LINE # 168
 	ORL  	PCON,#01H
 ; 		}
-			; SOURCE LINE # 160
+			; SOURCE LINE # 169
 ?C0012:
 ; 	#endif
 ; 	}
-			; SOURCE LINE # 162
+			; SOURCE LINE # 171
 	SJMP 	?C0008
 ?C0009:
 ; }
-			; SOURCE LINE # 163
+			; SOURCE LINE # 172
 ?C0013:
 	RET  	
 ; END OF main

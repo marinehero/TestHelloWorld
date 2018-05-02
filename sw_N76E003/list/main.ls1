@@ -1,4 +1,4 @@
-A51 MACRO ASSEMBLER  MAIN                                                                 06/05/2017 21:33:15 PAGE     1
+A51 MACRO ASSEMBLER  MAIN                                                                 05/02/2018 11:32:33 PAGE     1
 
 
 MACRO ASSEMBLER A51 V8.02b
@@ -65,7 +65,7 @@ LOC  OBJ            LINE     SOURCE
   0080                55     INT0    BIT     080H.0
   00C3                56     SI      BIT     0C0H.3
   00D7                57     CY      BIT     0D0H.7
-A51 MACRO ASSEMBLER  MAIN                                                                 06/05/2017 21:33:15 PAGE     2
+A51 MACRO ASSEMBLER  MAIN                                                                 05/02/2018 11:32:33 PAGE     2
 
   00EE                58     ADCS    BIT     0E8H.6
   00FF                59     FE_1    BIT     0F8H.7
@@ -133,7 +133,7 @@ LOC  OBJ            LINE     SOURCE
   0089               121     IE0     BIT     088H.1
   008B               122     IE1     BIT     088H.3
   00E4               123     C0L     DATA    0E4H
-A51 MACRO ASSEMBLER  MAIN                                                                 06/05/2017 21:33:15 PAGE     3
+A51 MACRO ASSEMBLER  MAIN                                                                 05/02/2018 11:32:33 PAGE     3
 
   0091               124     SFRS    DATA    091H
   00E6               125     C1L     DATA    0E6H
@@ -201,7 +201,7 @@ LOC  OBJ            LINE     SOURCE
   00EC               187     PIF     DATA    0ECH
   0082               188     DPL     DATA    082H
   00FF               189     SM0_1   BIT     0F8H.7
-A51 MACRO ASSEMBLER  MAIN                                                                 06/05/2017 21:33:15 PAGE     4
+A51 MACRO ASSEMBLER  MAIN                                                                 05/02/2018 11:32:33 PAGE     4
 
   00FC               190     PMD     DATA    0FCH
   00B7               191     IPH     DATA    0B7H
@@ -269,7 +269,7 @@ LOC  OBJ            LINE     SOURCE
                      253     ?PR?BOD_Init?MAIN    SEGMENT CODE 
                      254     ?PR?Wkt_ISR?MAIN     SEGMENT CODE 
                      255     ?PR?WKT_Init?MAIN    SEGMENT CODE 
-A51 MACRO ASSEMBLER  MAIN                                                                 06/05/2017 21:33:15 PAGE     5
+A51 MACRO ASSEMBLER  MAIN                                                                 05/02/2018 11:32:33 PAGE     5
 
                      256     ?PR?Iwdg_Init?MAIN   SEGMENT CODE 
                      257     ?PR?EnterSleep?MAIN  SEGMENT CODE 
@@ -310,362 +310,378 @@ LOC  OBJ            LINE     SOURCE
                      292     ;  系统10ms唤醒一次,所有的计时都在主程序中进行
                      293     ;  10ms中断只做定时唤醒
                      294     ;  */
-                     295     ; #include "../inc/main.h"
-                     296     ; #include "../inc/key.h"
-                     297     ; #include "../inc/adc.h"
-                     298     ; #include "../inc/delay.h"
-                     299     ; #include "../inc/display.h"
-                     300     ; #include "../inc/normal.h"
-                     301     ; #include "../inc/standby.h"
-                     302     ; #include "../inc/tp5602.h"
-                     303     ; 
-                     304     ; static bool tick_flag;
-                     305     ; static bool sleep_flag;  //系统休眠
-                     306     ; u8 u8TH0_Tmp,u8TL0_Tmp;
-                     307     ; //==========================================================
-                     308     ; void SystemInit(void)
-                     309     
-----                 310             RSEG  ?PR?SystemInit?MAIN
-0000                 311     SystemInit:
-                     312                             ; SOURCE LINE # 20
-                     313     ; {
-                     314                             ; SOURCE LINE # 21
-                     315     ;       CKDIV = 1;  //fosc = 16M  fCPU = 8M
-                     316                             ; SOURCE LINE # 22
-0000 759501          317             MOV     CKDIV,#01H
-                     318     ;       set_CLOEN;
-                     319                             ; SOURCE LINE # 23
-0003 438E02          320             ORL     CKCON,#02H
-                     321     ;                                                                                          
-A51 MACRO ASSEMBLER  MAIN                                                                 06/05/2017 21:33:15 PAGE     6
+                     295     ;  
+                     296     ;  /*
+                     297     ;            b7        b6        b5        b4        b3        b2         b1         b0
+                     298     ;  config0   CBS       Reserved  OCDPWM    OCDEN     Reserved  RPD        LOCK       Reserv
+                             ed     0xf9   RST_PIN->P2.0  LOCK_EN
+                     299     ;  config1   Reserved  Reserved  Reserved  Reserved  Reserved  LDSIZE[2]  LDSIZE[1]  LDSIZE
+                             [0]    0xff
+                     300     ;  config2   CBODEN    Reserved  CBOV[1]   CBOV[0]   BOIAP     CBORST     Reserved   Reserv
+                             ed     0xef   2.7V
+                     301     ;  config3   Reserved  Reserved  Reserved  Reserved  Reserved  Reserved   Reserved   Reserv
+                             ed     0xff
+                     302     ;  config4   WDTEN[3]  WDTEN[2]  WDTEN[1]  WDTEN[0]  Reserved  Reserved   Reserved   Reserv
+                             ed     0xff
+                     303     ;  */
+                     304     ; #include "../inc/main.h"
+                     305     ; #include "../inc/key.h"
+                     306     ; #include "../inc/adc.h"
+                     307     ; #include "../inc/delay.h"
+                     308     ; #include "../inc/display.h"
+                     309     ; #include "../inc/normal.h"
+                     310     ; #include "../inc/standby.h"
+                     311     ; #include "../inc/tp5602.h"
+                     312     ; 
+                     313     ; static bool tick_flag;
+                     314     ; static bool sleep_flag;  //系统休眠
+                     315     ; u8 u8TH0_Tmp,u8TL0_Tmp;
+                     316     ; //==========================================================
+A51 MACRO ASSEMBLER  MAIN                                                                 05/02/2018 11:32:33 PAGE     6
 
+                     317     ; void SystemInit(void)
+                     318     
+----                 319             RSEG  ?PR?SystemInit?MAIN
+0000                 320     SystemInit:
+                     321                             ; SOURCE LINE # 29
+                     322     ; {
+                     323                             ; SOURCE LINE # 30
+                     324     ;       CKDIV = 1;  //fosc = 16M  fCPU = 8M
+                     325                             ; SOURCE LINE # 31
+0000 759501          326             MOV     CKDIV,#01H
+                     327     ;       set_CLOEN;
+                     328                             ; SOURCE LINE # 32
+0003 438E02          329             ORL     CKCON,#02H
+                     330     ;                                                                                          
                                                                   // when P3.0 keep high, clock out HIRC
-                     322     ;       tick_flag = true;
-                     323                             ; SOURCE LINE # 25
-0006 750001   F      324             MOV     tick_flag,#01H
-                     325     ;       sleep_flag = false;
-                     326                             ; SOURCE LINE # 26
-0009 750000   F      327             MOV     sleep_flag,#00H
-                     328     ; }
-                     329                             ; SOURCE LINE # 27
-000C                 330     ?C0001:
-000C 22              331             RET     
-                     332     ; END OF SystemInit
-                     333     
-                     334     ; 
-                     335     ; static void BOD_Init(void)
-                     336     
-----                 337             RSEG  ?PR?BOD_Init?MAIN
-0000                 338     BOD_Init:
-                     339             USING   0
-                     340                             ; SOURCE LINE # 29
-                     341     ; {
-                     342                             ; SOURCE LINE # 30
-                     343     ; #pragma asm
-                     344     ;   MOV TA, #0AAH
-0000 75C7AA          345               MOV TA, #0AAH
-                     346     ;       MOV TA, #55H
-0003 75C755          347               MOV TA, #55H
-                     348     ;       MOV BODCON0, #0A4H    //BOEN 2.7V BORST
-0006 75A3A4          349               MOV BODCON0, #0A4H     
-                     350     ;       
-                     351               
-                     352     ;       MOV TA, #0AAH
-0009 75C7AA          353               MOV TA, #0AAH
-                     354     ;       MOV TA, #55H
-000C 75C755          355               MOV TA, #55H
-                     356     ;       MOV BODCON1, #07H    //25.6ms BODFLT
-000F 75AB07          357               MOV BODCON1, #07H     
-                     358     ; #pragma endasm
-                     359     ; }
-                     360                             ; SOURCE LINE # 40
-0012                 361     ?C0002:
-0012 22              362             RET     
-                     363     ; END OF BOD_Init
-                     364     
-----                 365     CSEG    AT      0008BH
-008B 020000   F      366             LJMP    Wkt_ISR
-                     367     
-                     368     ; //==========================================================
-                     369     ; /****************************************************************************************
-                             ********************
-                     370     ; *    TIMER 0 interrupt subroutine
-                     371     ; *****************************************************************************************
-                             *******************/
-                     372     ; void Wkt_ISR(void) interrupt 17  //interrupt address is 
+                     331     ;       tick_flag = true;
+                     332                             ; SOURCE LINE # 34
+0006 750001   F      333             MOV     tick_flag,#01H
+                     334     ;       sleep_flag = false;
+                     335                             ; SOURCE LINE # 35
+0009 750000   F      336             MOV     sleep_flag,#00H
+                     337     ; }
+                     338                             ; SOURCE LINE # 36
+000C                 339     ?C0001:
+000C 22              340             RET     
+                     341     ; END OF SystemInit
+                     342     
+                     343     ; 
+                     344     ; static void BOD_Init(void)
+                     345     
+----                 346             RSEG  ?PR?BOD_Init?MAIN
+0000                 347     BOD_Init:
+                     348             USING   0
+                     349                             ; SOURCE LINE # 38
+                     350     ; {
+                     351                             ; SOURCE LINE # 39
+                     352     ; #pragma asm
+                     353     ;   MOV TA, #0AAH
+0000 75C7AA          354               MOV TA, #0AAH
+                     355     ;       MOV TA, #55H
+0003 75C755          356               MOV TA, #55H
+                     357     ;       MOV BODCON0, #0A4H    //BOEN 2.7V BORST
+0006 75A3A4          358               MOV BODCON0, #0A4H     
+                     359     ;       
+                     360               
+                     361     ;       MOV TA, #0AAH
+0009 75C7AA          362               MOV TA, #0AAH
+                     363     ;       MOV TA, #55H
+000C 75C755          364               MOV TA, #55H
+                     365     ;       MOV BODCON1, #07H    //25.6ms BODFLT
+000F 75AB07          366               MOV BODCON1, #07H     
+                     367     ; #pragma endasm
+                     368     ; }
+                     369                             ; SOURCE LINE # 49
+0012                 370     ?C0002:
+0012 22              371             RET     
+                     372     ; END OF BOD_Init
                      373     
-----                 374             RSEG  ?PR?Wkt_ISR?MAIN
-                     375             USING   0
-0000                 376     Wkt_ISR:
-                     377                             ; SOURCE LINE # 45
-                     378     ; {  
-                     379     ;       clr_WKTF;
-                     380                             ; SOURCE LINE # 47
-0000 538FEF          381             ANL     WKCON,#0EFH
-                     382     ;   tick_flag=true;
-                     383                             ; SOURCE LINE # 48
-0003 750001   F      384             MOV     tick_flag,#01H
-A51 MACRO ASSEMBLER  MAIN                                                                 06/05/2017 21:33:15 PAGE     7
+----                 374     CSEG    AT      0008BH
+008B 020000   F      375             LJMP    Wkt_ISR
+                     376     
+                     377     ; //==========================================================
+                     378     ; /****************************************************************************************
+                             ********************
+                     379     ; *    TIMER 0 interrupt subroutine
+                     380     ; *****************************************************************************************
+A51 MACRO ASSEMBLER  MAIN                                                                 05/02/2018 11:32:33 PAGE     7
 
-                     385     ; }
-                     386                             ; SOURCE LINE # 49
-0006                 387     ?C0003:
-0006 32              388             RETI    
-                     389     ; END OF Wkt_ISR
-                     390     
-                     391     ; 
-                     392     ; static void WKT_Init(void)
-                     393     
-----                 394             RSEG  ?PR?WKT_Init?MAIN
-0000                 395     WKT_Init:
-                     396                             ; SOURCE LINE # 51
-                     397     ; {
-                     398                             ; SOURCE LINE # 52
-                     399     ;       RWK=156;        //10MS
-                     400                             ; SOURCE LINE # 53
-0000 75869C          401             MOV     RWK,#09CH
-                     402     ;   WKCON = 0x08;   //1分频  
-                     403                             ; SOURCE LINE # 54
-0003 758F08          404             MOV     WKCON,#08H
-                     405     ;       set_EWKT;//使能wkt中断
-                     406                             ; SOURCE LINE # 55
-0006 439C04          407             ORL     EIE1,#04H
-                     408     ; }
-                     409                             ; SOURCE LINE # 56
-0009                 410     ?C0004:
-0009 22              411             RET     
-                     412     ; END OF WKT_Init
-                     413     
-                     414     ; //==========================================================
-                     415     ; 
-                     416     ; //==========================================================
-                     417     ; #if(0)   //#ifndef   DEBUG
-                     418     ; /***********************************************************************
-                     419     ;       WDT CONFIG enable 
-                     420     ;       warning : this macro is only when ICP not enable CONFIG WDT function
-                     421     ;       copy this marco code to you code to enable WDT reset.
-                     422     ; ************************************************************************/
-                     423     ;       void Enable_WDT_Reset_Config(void)
-                     424     ;       {
-                     425     ;                       set_IAPEN;
-                     426     ;                       IAPAL = 0x04;
-                     427     ;                       IAPAH = 0x00;
-                     428     ;                       IAPFD = 0x0F;
-                     429     ;                       IAPCN = 0xE1;
-                     430     ;                       set_CFUEN;
-                     431     ;                       set_IAPGO;                                  //trigger IAP
-                     432     ;                       while((CHPCON&SET_BIT6)==SET_BIT6);          //check IAPFF (CHPCON.
+                             *******************/
+                     381     ; void Wkt_ISR(void) interrupt 17  //interrupt address is 
+                     382     
+----                 383             RSEG  ?PR?Wkt_ISR?MAIN
+                     384             USING   0
+0000                 385     Wkt_ISR:
+                     386                             ; SOURCE LINE # 54
+                     387     ; {  
+                     388     ;       clr_WKTF;
+                     389                             ; SOURCE LINE # 56
+0000 538FEF          390             ANL     WKCON,#0EFH
+                     391     ;   tick_flag=true;
+                     392                             ; SOURCE LINE # 57
+0003 750001   F      393             MOV     tick_flag,#01H
+                     394     ; }
+                     395                             ; SOURCE LINE # 58
+0006                 396     ?C0003:
+0006 32              397             RETI    
+                     398     ; END OF Wkt_ISR
+                     399     
+                     400     ; 
+                     401     ; static void WKT_Init(void)
+                     402     
+----                 403             RSEG  ?PR?WKT_Init?MAIN
+0000                 404     WKT_Init:
+                     405                             ; SOURCE LINE # 60
+                     406     ; {
+                     407                             ; SOURCE LINE # 61
+                     408     ;       RWK=156;        //10MS
+                     409                             ; SOURCE LINE # 62
+0000 75869C          410             MOV     RWK,#09CH
+                     411     ;   WKCON = 0x08;   //1分频  
+                     412                             ; SOURCE LINE # 63
+0003 758F08          413             MOV     WKCON,#08H
+                     414     ;       set_EWKT;//使能wkt中断
+                     415                             ; SOURCE LINE # 64
+0006 439C04          416             ORL     EIE1,#04H
+                     417     ; }
+                     418                             ; SOURCE LINE # 65
+0009                 419     ?C0004:
+0009 22              420             RET     
+                     421     ; END OF WKT_Init
+                     422     
+                     423     ; //==========================================================
+                     424     ; 
+                     425     ; //==========================================================
+                     426     ; #if(0)   //#ifndef   DEBUG
+                     427     ; /***********************************************************************
+                     428     ;       WDT CONFIG enable 
+                     429     ;       warning : this macro is only when ICP not enable CONFIG WDT function
+                     430     ;       copy this marco code to you code to enable WDT reset.
+                     431     ; ************************************************************************/
+                     432     ;       void Enable_WDT_Reset_Config(void)
+                     433     ;       {
+                     434     ;                       set_IAPEN;
+                     435     ;                       IAPAL = 0x04;
+                     436     ;                       IAPAH = 0x00;
+                     437     ;                       IAPFD = 0x0F;
+                     438     ;                       IAPCN = 0xE1;
+                     439     ;                       set_CFUEN;
+                     440     ;                       set_IAPGO;                                  //trigger IAP
+                     441     ;                       while((CHPCON&SET_BIT6)==SET_BIT6);          //check IAPFF (CHPCON.
                              6)
-                     433     ;                       clr_CFUEN;
-                     434     ;                       clr_IAPEN;
-                     435     ;       }
-                     436     ;       #define IWDG_Feed()   set_WDCLR
-                     437     ;       
-                     438     ;       static void Iwdg_Init(void)
-                     439     ;       {
-                     440     ;               Enable_WDT_Reset_Config();
-                     441     ;               TA=0xAA;TA=0x55;WDCON=0x07;                                     //Setting W
+                     442     ;                       clr_CFUEN;
+                     443     ;                       clr_IAPEN;
+                     444     ;       }
+A51 MACRO ASSEMBLER  MAIN                                                                 05/02/2018 11:32:33 PAGE     8
+
+                     445     ;       #define IWDG_Feed()   set_WDCLR
+                     446     ;       
+                     447     ;       static void Iwdg_Init(void)
+                     448     ;       {
+                     449     ;               Enable_WDT_Reset_Config();
+                     450     ;               TA=0xAA;TA=0x55;WDCON=0x07;                                     //Setting W
                              DT prescale 
-                     442     ;               set_WDCLR;                                                                 
+                     451     ;               set_WDCLR;                                                                 
                                   //Clear WDT timer
-                     443     ;               while((WDCON|~SET_BIT6)==0xFF);                         //confirm WDT clear
+                     452     ;               while((WDCON|~SET_BIT6)==0xFF);                         //confirm WDT clear
                               is ok before into power down mode
-                     444     ;               EA = 1;
-                     445     ;               set_WDTR;                                                                  
+                     453     ;               EA = 1;
+                     454     ;               set_WDTR;                                                                  
                                   //WDT run       
-A51 MACRO ASSEMBLER  MAIN                                                                 06/05/2017 21:33:15 PAGE     8
+                     455     ;       }
+                     456     ; #else
+                     457     ;       #define IWDG_Feed()   
+                     458     ;       
+                     459     ;       static void Iwdg_Init(void)
+                     460     
+----                 461             RSEG  ?PR?Iwdg_Init?MAIN
+0000                 462     Iwdg_Init:
+                     463                             ; SOURCE LINE # 102
+                     464     ;       {
+                     465                             ; SOURCE LINE # 103
+                     466     ;               
+                     467     ;       }
+                     468                             ; SOURCE LINE # 105
+0000                 469     ?C0005:
+0000 22              470             RET     
+                     471     ; END OF Iwdg_Init
+                     472     
+                     473     ; #endif
+                     474     ; //==========================================================
+                     475     ; 
+                     476     ; //==========================================================
+                     477     ; void EnterSleep(void)
+                     478     
+----                 479             RSEG  ?PR?EnterSleep?MAIN
+0000                 480     EnterSleep:
+                     481             USING   0
+                     482                             ; SOURCE LINE # 110
+                     483     ; {
+                     484                             ; SOURCE LINE # 111
+                     485     ;       DisplayEnterSleep();
+                     486                             ; SOURCE LINE # 112
+0000 120000   F      487             LCALL   DisplayEnterSleep
+                     488     ;       EnterStandby();
+                     489                             ; SOURCE LINE # 113
+0003 120000   F      490             LCALL   EnterStandby
+                     491     ; }
+                     492                             ; SOURCE LINE # 114
+0006                 493     ?C0006:
+0006 22              494             RET     
+                     495     ; END OF EnterSleep
+                     496     
+                     497     ; 
+                     498     ; void ExitSleep(void)
+                     499     
+----                 500             RSEG  ?PR?ExitSleep?MAIN
+0000                 501     ExitSleep:
+                     502             USING   0
+                     503                             ; SOURCE LINE # 116
+                     504     ; {  
+                     505                             ; SOURCE LINE # 117
+                     506     ;       DisplayExitSleep();
+A51 MACRO ASSEMBLER  MAIN                                                                 05/02/2018 11:32:33 PAGE     9
 
-                     446     ;       }
-                     447     ; #else
-                     448     ;       #define IWDG_Feed()   
-                     449     ;       
-                     450     ;       static void Iwdg_Init(void)
-                     451     
-----                 452             RSEG  ?PR?Iwdg_Init?MAIN
-0000                 453     Iwdg_Init:
-                     454                             ; SOURCE LINE # 93
-                     455     ;       {
-                     456                             ; SOURCE LINE # 94
-                     457     ;               
-                     458     ;       }
-                     459                             ; SOURCE LINE # 96
-0000                 460     ?C0005:
-0000 22              461             RET     
-                     462     ; END OF Iwdg_Init
-                     463     
-                     464     ; #endif
-                     465     ; //==========================================================
-                     466     ; 
-                     467     ; //==========================================================
-                     468     ; void EnterSleep(void)
-                     469     
-----                 470             RSEG  ?PR?EnterSleep?MAIN
-0000                 471     EnterSleep:
-                     472             USING   0
-                     473                             ; SOURCE LINE # 101
-                     474     ; {
-                     475                             ; SOURCE LINE # 102
-                     476     ;       DisplayEnterSleep();
-                     477                             ; SOURCE LINE # 103
-0000 120000   F      478             LCALL   DisplayEnterSleep
-                     479     ;       EnterStandby();
-                     480                             ; SOURCE LINE # 104
-0003 120000   F      481             LCALL   EnterStandby
-                     482     ; }
-                     483                             ; SOURCE LINE # 105
-0006                 484     ?C0006:
-0006 22              485             RET     
-                     486     ; END OF EnterSleep
-                     487     
-                     488     ; 
-                     489     ; void ExitSleep(void)
-                     490     
-----                 491             RSEG  ?PR?ExitSleep?MAIN
-0000                 492     ExitSleep:
-                     493             USING   0
-                     494                             ; SOURCE LINE # 107
-                     495     ; {  
-                     496                             ; SOURCE LINE # 108
-                     497     ;       DisplayExitSleep();
-                     498                             ; SOURCE LINE # 109
-0000 120000   F      499             LCALL   DisplayExitSleep
-                     500     ;       EnterNormal();
-                     501                             ; SOURCE LINE # 110
-0003 120000   F      502             LCALL   EnterNormal
-                     503     ; }
-                     504                             ; SOURCE LINE # 111
-0006                 505     ?C0007:
-0006 22              506             RET     
-                     507     ; END OF ExitSleep
-                     508     
-                     509     ; //==========================================================
-                     510     ; 
-                     511     ; //==========================================================
-A51 MACRO ASSEMBLER  MAIN                                                                 06/05/2017 21:33:15 PAGE     9
+                     507                             ; SOURCE LINE # 118
+0000 120000   F      508             LCALL   DisplayExitSleep
+                     509     ;       EnterNormal();
+                     510                             ; SOURCE LINE # 119
+0003 120000   F      511             LCALL   EnterNormal
+                     512     ; }
+                     513                             ; SOURCE LINE # 120
+0006                 514     ?C0007:
+0006 22              515             RET     
+                     516     ; END OF ExitSleep
+                     517     
+                     518     ; //==========================================================
+                     519     ; 
+                     520     ; //==========================================================
+                     521     ; main()
+                     522     
+----                 523             RSEG  ?PR?main?MAIN
+0000                 524     main:
+                     525             USING   0
+                     526                             ; SOURCE LINE # 124
+                     527     ; {
+                     528                             ; SOURCE LINE # 125
+                     529     ;       Delayms(100);
+                     530                             ; SOURCE LINE # 126
+0000 7F64            531             MOV     R7,#064H
+0002 7E00            532             MOV     R6,#00H
+0004 120000   F      533             LCALL   _Delayms
+                     534     ;       
+                     535     ;       Iwdg_Init();
+                     536                             ; SOURCE LINE # 128
+0007 120000   F      537             LCALL   Iwdg_Init
+                     538     ;       SystemInit();
+                     539                             ; SOURCE LINE # 129
+000A 120000   F      540             LCALL   SystemInit
+                     541     ;       BOD_Init();
+                     542                             ; SOURCE LINE # 130
+000D 120000   F      543             LCALL   BOD_Init
+                     544     ;   
+                     545     ;       InitAdc();
+                     546                             ; SOURCE LINE # 132
+0010 120000   F      547             LCALL   InitAdc
+                     548     ;       KeyInit();
+                     549                             ; SOURCE LINE # 133
+0013 120000   F      550             LCALL   KeyInit
+                     551     ;       WKT_Init();
+                     552                             ; SOURCE LINE # 134
+0016 120000   F      553             LCALL   WKT_Init
+                     554     ;       DisplayInitPoweron();
+                     555                             ; SOURCE LINE # 135
+0019 120000   F      556             LCALL   DisplayInitPoweron
+                     557     ;       TP5602InitPoweron();
+                     558                             ; SOURCE LINE # 136
+001C 120000   F      559             LCALL   TP5602InitPoweron
+                     560     ; 
+                     561     ;       /*
+                     562     ;       clr_P05;
+                     563     ;       clr_P06;
+                     564     ;       set_P07;
+                     565     ;       Delayms(1000);
+                     566     ; 
+                     567     ;       clr_P05;
+                     568     ;       set_P06;
+                     569     ;       clr_P07;
+                     570     ;       */
+                     571     ;       EnterNormal();
+                     572                             ; SOURCE LINE # 148
+A51 MACRO ASSEMBLER  MAIN                                                                 05/02/2018 11:32:33 PAGE    10
 
-                     512     ; main()
-                     513     
-----                 514             RSEG  ?PR?main?MAIN
-0000                 515     main:
-                     516             USING   0
-                     517                             ; SOURCE LINE # 115
-                     518     ; {
-                     519                             ; SOURCE LINE # 116
-                     520     ;       Delayms(100);
-                     521                             ; SOURCE LINE # 117
-0000 7F64            522             MOV     R7,#064H
-0002 7E00            523             MOV     R6,#00H
-0004 120000   F      524             LCALL   _Delayms
-                     525     ;       
-                     526     ;       Iwdg_Init();
-                     527                             ; SOURCE LINE # 119
-0007 120000   F      528             LCALL   Iwdg_Init
-                     529     ;       SystemInit();
-                     530                             ; SOURCE LINE # 120
-000A 120000   F      531             LCALL   SystemInit
-                     532     ;       BOD_Init();
-                     533                             ; SOURCE LINE # 121
-000D 120000   F      534             LCALL   BOD_Init
-                     535     ;   
-                     536     ;       InitAdc();
-                     537                             ; SOURCE LINE # 123
-0010 120000   F      538             LCALL   InitAdc
-                     539     ;       KeyInit();
-                     540                             ; SOURCE LINE # 124
-0013 120000   F      541             LCALL   KeyInit
-                     542     ;       WKT_Init();
-                     543                             ; SOURCE LINE # 125
-0016 120000   F      544             LCALL   WKT_Init
-                     545     ;       DisplayInitPoweron();
-                     546                             ; SOURCE LINE # 126
-0019 120000   F      547             LCALL   DisplayInitPoweron
-                     548     ;       TP5602InitPoweron();
-                     549                             ; SOURCE LINE # 127
-001C 120000   F      550             LCALL   TP5602InitPoweron
-                     551     ; 
-                     552     ;       /*
-                     553     ;       clr_P05;
-                     554     ;       clr_P06;
-                     555     ;       set_P07;
-                     556     ;       Delayms(1000);
-                     557     ; 
-                     558     ;       clr_P05;
-                     559     ;       set_P06;
-                     560     ;       clr_P07;
-                     561     ;       */
-                     562     ;       EnterNormal();
-                     563                             ; SOURCE LINE # 139
-001F 120000   F      564             LCALL   EnterNormal
-0022                 565     ?C0008:
-                     566     ;       
-                     567     ;       IWDG_Feed();
-                     568     ;       while (1)
-                     569                             ; SOURCE LINE # 142
-                     570     ;       {
-                     571                             ; SOURCE LINE # 143
-                     572     ;               if(tick_flag)
-                     573                             ; SOURCE LINE # 144
-0022 E500     F      574             MOV     A,tick_flag
-0024 600F            575             JZ      ?C0010
-                     576     ;               {
-                     577                             ; SOURCE LINE # 145
-A51 MACRO ASSEMBLER  MAIN                                                                 06/05/2017 21:33:15 PAGE    10
+001F 120000   F      573             LCALL   EnterNormal
+0022                 574     ?C0008:
+                     575     ;       
+                     576     ;       IWDG_Feed();
+                     577     ;       while (1)
+                     578                             ; SOURCE LINE # 151
+                     579     ;       {
+                     580                             ; SOURCE LINE # 152
+                     581     ;               if(tick_flag)
+                     582                             ; SOURCE LINE # 153
+0022 E500     F      583             MOV     A,tick_flag
+0024 600F            584             JZ      ?C0010
+                     585     ;               {
+                     586                             ; SOURCE LINE # 154
+                     587     ;                       tick_flag = false;
+                     588                             ; SOURCE LINE # 155
+0026 750000   F      589             MOV     tick_flag,#00H
+                     590     ;                       IWDG_Feed();
+                     591     ;                       AdcTimeHook();
+                     592                             ; SOURCE LINE # 157
+0029 120000   F      593             LCALL   AdcTimeHook
+                     594     ;                       Tp5602Funtion();
+                     595                             ; SOURCE LINE # 158
+002C 120000   F      596             LCALL   Tp5602Funtion
+                     597     ;                       KeyFuntion();
+                     598                             ; SOURCE LINE # 159
+002F 120000   F      599             LCALL   KeyFuntion
+                     600     ;                       RefreshDisplay();
+                     601                             ; SOURCE LINE # 160
+0032 120000   F      602             LCALL   RefreshDisplay
+                     603     ;               }
+                     604                             ; SOURCE LINE # 161
+0035                 605     ?C0010:
+                     606     ;       #ifndef DEBUG
+                     607     ;       if(IsDispStandby())
+                     608                             ; SOURCE LINE # 163
+0035 120000   F      609             LCALL   IsDispStandby
+0038 EF              610             MOV     A,R7
+0039 6005            611             JZ      ?C0011
+                     612     ;       {
+                     613                             ; SOURCE LINE # 164
+                     614     ;               set_PD;
+                     615                             ; SOURCE LINE # 165
+003B 438702          616             ORL     PCON,#02H
+                     617     ;       }else
+                     618                             ; SOURCE LINE # 166
+003E 80E2            619             SJMP    ?C0008
+0040                 620     ?C0011:
+                     621     ;               {
+                     622                             ; SOURCE LINE # 167
+                     623     ;                       set_IDL;
+                     624                             ; SOURCE LINE # 168
+0040 438701          625             ORL     PCON,#01H
+                     626     ;               }
+                     627                             ; SOURCE LINE # 169
+0043                 628     ?C0012:
+                     629     ;       #endif
+                     630     ;       }
+                     631                             ; SOURCE LINE # 171
+0043 80DD            632             SJMP    ?C0008
+0045                 633     ?C0009:
+                     634     ; }
+                     635                             ; SOURCE LINE # 172
+0045                 636     ?C0013:
+0045 22              637             RET     
+                     638     ; END OF main
+A51 MACRO ASSEMBLER  MAIN                                                                 05/02/2018 11:32:33 PAGE    11
 
-                     578     ;                       tick_flag = false;
-                     579                             ; SOURCE LINE # 146
-0026 750000   F      580             MOV     tick_flag,#00H
-                     581     ;                       IWDG_Feed();
-                     582     ;                       AdcTimeHook();
-                     583                             ; SOURCE LINE # 148
-0029 120000   F      584             LCALL   AdcTimeHook
-                     585     ;                       Tp5602Funtion();
-                     586                             ; SOURCE LINE # 149
-002C 120000   F      587             LCALL   Tp5602Funtion
-                     588     ;                       KeyFuntion();
-                     589                             ; SOURCE LINE # 150
-002F 120000   F      590             LCALL   KeyFuntion
-                     591     ;                       RefreshDisplay();
-                     592                             ; SOURCE LINE # 151
-0032 120000   F      593             LCALL   RefreshDisplay
-                     594     ;               }
-                     595                             ; SOURCE LINE # 152
-0035                 596     ?C0010:
-                     597     ;       #ifndef DEBUG
-                     598     ;       if(IsDispStandby())
-                     599                             ; SOURCE LINE # 154
-0035 120000   F      600             LCALL   IsDispStandby
-0038 EF              601             MOV     A,R7
-0039 6005            602             JZ      ?C0011
-                     603     ;       {
-                     604                             ; SOURCE LINE # 155
-                     605     ;               set_PD;
-                     606                             ; SOURCE LINE # 156
-003B 438702          607             ORL     PCON,#02H
-                     608     ;       }else
-                     609                             ; SOURCE LINE # 157
-003E 80E2            610             SJMP    ?C0008
-0040                 611     ?C0011:
-                     612     ;               {
-                     613                             ; SOURCE LINE # 158
-                     614     ;                       set_IDL;
-                     615                             ; SOURCE LINE # 159
-0040 438701          616             ORL     PCON,#01H
-                     617     ;               }
-                     618                             ; SOURCE LINE # 160
-0043                 619     ?C0012:
-                     620     ;       #endif
-                     621     ;       }
-                     622                             ; SOURCE LINE # 162
-0043 80DD            623             SJMP    ?C0008
-0045                 624     ?C0009:
-                     625     ; }
-                     626                             ; SOURCE LINE # 163
-0045                 627     ?C0013:
-0045 22              628             RET     
-                     629     ; END OF main
-                     630     
-                     631             END
-A51 MACRO ASSEMBLER  MAIN                                                                 06/05/2017 21:33:15 PAGE    11
+                     639     
+                     640             END
+A51 MACRO ASSEMBLER  MAIN                                                                 05/02/2018 11:32:33 PAGE    12
 
 SYMBOL TABLE LISTING
 ------ ----- -------
@@ -733,7 +749,7 @@ C0L . . . . . . . .  D ADDR   00E4H   A
 C1H . . . . . . . .  D ADDR   00E7H   A   
 C1L . . . . . . . .  D ADDR   00E6H   A   
 C2H . . . . . . . .  D ADDR   00EEH   A   
-A51 MACRO ASSEMBLER  MAIN                                                                 06/05/2017 21:33:15 PAGE    12
+A51 MACRO ASSEMBLER  MAIN                                                                 05/02/2018 11:32:33 PAGE    13
 
 C2L . . . . . . . .  D ADDR   00EDH   A   
 CAPCON0 . . . . . .  D ADDR   0092H   A   
@@ -801,7 +817,7 @@ INT1. . . . . . . .  B ADDR   0080H.1 A
 IP. . . . . . . . .  D ADDR   00B8H   A   
 IPH . . . . . . . .  D ADDR   00B7H   A   
 ISDISPSTANDBY . . .  C ADDR   -----       EXT
-A51 MACRO ASSEMBLER  MAIN                                                                 06/05/2017 21:33:15 PAGE    13
+A51 MACRO ASSEMBLER  MAIN                                                                 05/02/2018 11:32:33 PAGE    14
 
 IT0 . . . . . . . .  B ADDR   0088H.0 A   
 IT1 . . . . . . . .  B ADDR   0088H.2 A   
@@ -869,7 +885,7 @@ PWM0. . . . . . . .  B ADDR   0090H.0 A
 PWM0H . . . . . . .  D ADDR   00D2H   A   
 PWM0L . . . . . . .  D ADDR   00DAH   A   
 PWM1. . . . . . . .  B ADDR   0090H.1 A   
-A51 MACRO ASSEMBLER  MAIN                                                                 06/05/2017 21:33:15 PAGE    14
+A51 MACRO ASSEMBLER  MAIN                                                                 05/02/2018 11:32:33 PAGE    15
 
 PWM1H . . . . . . .  D ADDR   00D3H   A   
 PWM1L . . . . . . .  D ADDR   00DBH   A   
@@ -937,7 +953,7 @@ SS. . . . . . . . .  B ADDR   0080H.4 A
 STA . . . . . . . .  B ADDR   00C0H.5 A   
 STO . . . . . . . .  B ADDR   00C0H.4 A   
 SYSTEMINIT. . . . .  C ADDR   0000H   R   SEG=?PR?SYSTEMINIT?MAIN
-A51 MACRO ASSEMBLER  MAIN                                                                 06/05/2017 21:33:15 PAGE    15
+A51 MACRO ASSEMBLER  MAIN                                                                 05/02/2018 11:32:33 PAGE    16
 
 T2CON . . . . . . .  D ADDR   00C8H   A   
 T2MOD . . . . . . .  D ADDR   00C9H   A   
